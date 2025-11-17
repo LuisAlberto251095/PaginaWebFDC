@@ -50,4 +50,5 @@ def home():
 # --- Creación de las tablas ---
 # Esto es importante: le dice a la base de datos que cree la tabla "Visitor"
 # si es que no existe.
-with app.app_context():
+with app.app_context()
+
