@@ -6,9 +6,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 app = Flask(__name__)
 
 # --- CONFIGURACIÓN DE LA BASE DE DATOS ---
-# Obtiene la URL de la base de datos desde Render
 db_url = os.environ.get('DATABASE_URL', 'sqlite:///site.db')
-# Corrección necesaria para que funcione en Render (cambia postgres:// a postgresql://)
 if db_url.startswith("postgres://"):
     db_url = db_url.replace("postgres://", "postgresql://", 1)
 
@@ -24,10 +22,10 @@ class User(db.Model):
     nombres = db.Column(db.String(100), nullable=False)
     apellidos = db.Column(db.String(100), nullable=False)
     cedula = db.Column(db.String(10), unique=True, nullable=False)
-    celular = db.Column(db.String(15), nullable=False)
+    # CELULAR ELIMINADO del formulario, pero podría seguir en DB si se quisiera guardar
+    # pais = db.Column(db.String(50), nullable=False, default='Ecuador')
+    # provincia = db.Column(db.String(50), nullable=False, default='Cotopaxi')
     institucion_deportiva = db.Column(db.String(100), nullable=False)
-    pais = db.Column(db.String(50), nullable=False, default='Ecuador')
-    provincia = db.Column(db.String(50), nullable=False, default='Cotopaxi')
     canton = db.Column(db.String(50), nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     username = db.Column(db.String(80), unique=True, nullable=False)
@@ -53,13 +51,10 @@ def login():
     username = request.form['username']
     password = request.form['password']
     
-    # Busca el usuario en la base de datos
     user = User.query.filter_by(username=username).first()
     
-    # Verifica contraseña
     if user and check_password_hash(user.password_hash, password):
         flash(f'¡Bienvenido {user.nombres}!', 'success')
-        # AQUÍ REDIRIGIREMOS AL MENÚ PRINCIPAL CUANDO LO CREEMOS
         return redirect(url_for('home')) 
     else:
         flash('Usuario o contraseña incorrectos.', 'danger')
@@ -71,48 +66,51 @@ def create_account():
 
 @app.route('/register_admin', methods=['GET', 'POST'])
 def register_admin():
-    # Lista de opciones para Institución y Cantón
     opciones_institucion = ["Latacunga", "La Maná", "Pujilí", "Salcedo", "Saquisilí", "Sigchos", "Pangua", "Todos"]
     
     if request.method == 'POST':
-        # --- RESTRICCIÓN: SOLO UN ADMINISTRADOR ---
-        # Buscamos si ya existe alguien con el rol 'Administrador'
         existing_admin = User.query.filter_by(role='Administrador').first()
         
         if existing_admin:
-            # MENSAJE SOLICITADO
             flash('El sistema ya tiene un administrador.', 'danger')
             return render_template('register_admin.html', opciones=opciones_institucion)
 
-        # Recopilar datos del formulario
         nombres = request.form.get('nombres')
         apellidos = request.form.get('apellidos')
         cedula = request.form.get('cedula')
-        celular = request.form.get('celular')
+        # celular = request.form.get('celular') # ELIMINADO
         institucion = request.form.get('institucion_deportiva')
-        canton = request.form.get('canton') # Usaremos el mismo valor o el que elijas
+        # pais = "Ecuador" # ELIMINADO (se puede reintroducir si es necesario en la DB)
+        # provincia = "Cotopaxi" # ELIMINADO (se puede reintroducir si es necesario en la DB)
+        canton = request.form.get('canton')
         email = request.form.get('email')
         username = request.form.get('username')
         password = request.form.get('password')
         confirm_password = request.form.get('confirm_password')
         recuperacion_email = request.form.get('recuperacion_email')
 
-        # Validar contraseñas
         if password != confirm_password:
             flash('Las contraseñas no coinciden.', 'danger')
-            return render_template('register_admin.html', opciones=opciones_institucion)
+            return render_template('register_admin.html', opciones=opciones_institucion,
+                                   nombres=nombres, apellidos=apellidos, cedula=cedula,
+                                   institucion_deportiva=institucion, canton=canton,
+                                   email=email, username=username, recuperacion_email=recuperacion_email)
 
-        # Verificar si usuario o email ya existen (aunque no sean admin)
+        # Validar si usuario, email o cédula ya existen
         if User.query.filter((User.email == email) | (User.username == username) | (User.cedula == cedula)).first():
              flash('El usuario, correo o cédula ya están registrados.', 'danger')
-             return render_template('register_admin.html', opciones=opciones_institucion)
+             return render_template('register_admin.html', opciones=opciones_institucion,
+                                    nombres=nombres, apellidos=apellidos, cedula=cedula,
+                                    institucion_deportiva=institucion, canton=canton,
+                                    email=email, username=username, recuperacion_email=recuperacion_email)
 
-        # Hashear contraseña y crear usuario
+
         hashed_password = generate_password_hash(password)
         
         new_admin = User(
-            nombres=nombres, apellidos=apellidos, cedula=cedula, celular=celular,
-            institucion_deportiva=institucion, pais="Ecuador", provincia="Cotopaxi",
+            nombres=nombres, apellidos=apellidos, cedula=cedula, 
+            # celular=celular, # Si se elimina del HTML, debe eliminarse de aquí o asignarle un valor por defecto
+            institucion_deportiva=institucion, pais="Ecuador", provincia="Cotopaxi", # Estos se mantienen con valores por defecto
             canton=canton, email=email, username=username, password_hash=hashed_password,
             recuperacion_email=recuperacion_email, role='Administrador'
         )
@@ -125,7 +123,10 @@ def register_admin():
         except Exception as e:
             db.session.rollback()
             flash(f'Error al guardar: {str(e)}', 'danger')
-            return render_template('register_admin.html', opciones=opciones_institucion)
+            return render_template('register_admin.html', opciones=opciones_institucion,
+                                   nombres=nombres, apellidos=apellidos, cedula=cedula,
+                                   institucion_deportiva=institucion, canton=canton,
+                                   email=email, username=username, recuperacion_email=recuperacion_email)
 
     return render_template('register_admin.html', opciones=opciones_institucion)
 
