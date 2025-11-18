@@ -13,5 +13,10 @@ def login():
     # Aquí iría tu lógica de validación de usuario real
     return "Intentando iniciar sesión..."
 
+# --- NUEVA RUTA: TIPO DE CUENTA ---
+@app.route('/create_account')
+def create_account():
+    return render_template('account_type.html')
+
 if __name__ == '__main__':
     app.run(debug=True)
