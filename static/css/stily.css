@@ -122,35 +122,44 @@ body {
 
 .btn-big:hover { background-color: #152a6d; }
 
-/* --- ESTILOS PARA EL FORMULARIO DE REGISTRO DE ADMINISTRADOR --- */
+/* --- ESTILOS PARA EL FORMULARIO DE REGISTRO DE ADMINISTRADOR (ACTUALIZADOS) --- */
 
 .register-container {
-    background-color: #F0F0F0; /* Fondo blanco para el formulario */
+    background-color: #F0F0F0;
     border: 1px solid #ddd;
     border-radius: 10px;
     padding: 30px;
     width: 95%;
-    max-width: 600px;
+    max-width: 600px; /* Ancho máximo para el formulario */
     box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-    color: #333; /* Texto oscuro para contrastar con el blanco */
+    color: #333;
+    display: flex; /* Usar flexbox para centrar contenido */
+    flex-direction: column;
+    align-items: center; /* Centra el formulario */
+    text-align: center; /* Centra el texto dentro del formulario */
 }
 
 .register-title {
-    color: #333; /* Título oscuro */
-    text-align: center;
+    color: #333;
     font-size: 2rem;
     margin-bottom: 25px;
+    width: 100%; /* Asegura que el título ocupe todo el ancho */
 }
 
 .form-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr 1fr; /* Dos columnas por defecto */
     gap: 15px;
+    width: 100%; /* Ocupa todo el ancho del contenedor */
+    max-width: 500px; /* Ancho máximo para los campos del grid */
+}
+
+.input-group {
+    text-align: left; /* Alinea los labels a la izquierda dentro de cada grupo */
 }
 
 .input-group label {
     display: block;
-    text-align: left;
     margin-bottom: 5px;
     font-weight: bold;
     font-size: 0.9em;
@@ -181,18 +190,18 @@ body {
 /* Contenedor específico para inputs de contraseña con ojo */
 .password-input-container {
     position: relative;
-    display: flex; /* Para alinear el input y el ojo */
-    flex-direction: column; /* Para que el label esté arriba */
+    display: flex;
+    flex-direction: column;
 }
 .password-input-container input {
-    flex-grow: 1; /* Para que el input ocupe el espacio restante */
+    flex-grow: 1;
     padding-right: 40px; /* Espacio para el icono del ojo */
 }
 .password-toggle {
     position: absolute;
     right: 10px;
-    top: 50%; /* Ajuste inicial para el centro vertical */
-    transform: translateY(calc(50% + 5px)); /* Ajuste final para el centro vertical con el label */
+    top: 50%; /* Inicialmente centrado verticalmente */
+    transform: translateY(calc(-50% + 10px)); /* Ajuste fino para el centro del input */
     cursor: pointer;
 }
 .password-toggle img {
@@ -205,12 +214,15 @@ body {
     list-style: none;
     padding: 0;
     margin-bottom: 20px;
+    width: 100%;
+    max-width: 500px; /* Alineado con el ancho del formulario */
 }
 .flash-messages li {
     padding: 10px;
     border-radius: 5px;
     margin-bottom: 10px;
     font-weight: bold;
+    text-align: center; /* Centrar mensajes de flash */
 }
 .flash-messages .success {
     background-color: #d4edda;
@@ -224,7 +236,7 @@ body {
 }
 
 
-/* Responsividad */
+/* Responsividad: todo en una columna en móviles */
 @media (max-width: 600px) {
     .form-grid {
         grid-template-columns: 1fr;
@@ -233,7 +245,7 @@ body {
         grid-column: span 1;
     }
     .password-toggle {
-        top: calc(50% + 10px); /* Ajuste en móviles por el cambio de layout */
+        top: calc(50% + 10px); /* Ajuste para el ojo en pantallas pequeñas */
         transform: translateY(-50%);
     }
 }
