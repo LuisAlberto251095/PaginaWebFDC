@@ -1,1 +1,7 @@
-pip install Flask gunicorn Flask-SQLAlchemy psycopg2-binary Werkzeug python-dotenv email_validator
+Flask
+gunicorn
+Flask-SQLAlchemy
+psycopg2-binary
+python-dotenv
+Werkzeug
+email_validator
